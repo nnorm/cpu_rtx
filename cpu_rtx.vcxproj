@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\hittable.h" />
+    <ClInclude Include="include\material.h" />
     <ClInclude Include="include\parse_args.h" />
     <ClInclude Include="include\ray.h" />
     <ClInclude Include="include\sphere.h" />
