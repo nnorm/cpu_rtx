@@ -10,20 +10,23 @@ This is me trying to write yet-another-raytracer with minimal dependencies.
 Although I try to make it compilable somewhere else, I don't plan on writting support for other platforms than Win32. You could probably write a makefile that compiles this pretty fast.
 
 ## Task list
-### Following RT In One Weekend
+### Following "RT In One Weekend"
 - [X] Output PPM files of any size and filename
 - [X] Build a simple vec3 class
 - [X] Build a ray class
 - [X] Create the main raytracing loop
 - [X] Add background support
 - [X] Make a ray-sphere intersection
-  - [ ] basic intersection
-  - [ ] normal computation
+  - [X] basic intersection
+  - [X] normal computation
 - [ ] Re-factoring
-  - [ ] Put stuff into structs
-  - [ ] Generalize raytracing spheres
+  - [X] Put stuff into structs
+  - [X] Generalize raytracing spheres
   - [ ] Decouple raytracing from writting files
   - [ ] Put some of the structs into separate files
+- [ ] Anti-aliasing/better sampling
+  - [ ] basic random
+  - [ ] uniform random
 - [ ] Add very basic material support
   - [ ] albedo (RGB)
 

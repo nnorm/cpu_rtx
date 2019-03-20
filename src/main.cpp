@@ -1,65 +1,33 @@
 #include <parse_args.h>
+#include <ray.h>
+#include <hittable.h>
+#include <sphere.h>
+
 #include <stdio.h>
 #include <stddef.h>
 #include <assert.h>
 #include <fstream>
 #include <algorithm>
-
+#include <vector>
 #include <glm.hpp>
 
-/* DATA */
-struct Ray
-{
-	Ray(glm::vec3 const& ro = glm::vec3(), glm::vec3 const& rd = glm::vec3()) : origin(ro), direction(rd) {};
-	glm::vec3 origin;
-	glm::vec3 direction;
-	glm::vec3 compute_position(float t) const { return origin + (direction * t); }
-};
-
-struct HitRecord
-{
-	float t = 0.0f;
-	glm::vec3 position;
-	glm::vec3 normal;
-};
-
-struct Sphere
-{
-	glm::vec3 center;
-	float radius;
-};
-
 /* RAYTRACE */
-bool hit_sphere(Sphere const& sphere, Ray const& ray, float tmin, float tmax, HitRecord& record)
+bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, float tmax, HitRecord& record)
 {
-	glm::vec3 origin_center_vector = ray.origin - sphere.center;
-	//quadratic equation (ax² + bx + c) factors:
-	float a = glm::dot(ray.direction, ray.direction);
-	float b = glm::dot(origin_center_vector, ray.direction);
-	float c = glm::dot(origin_center_vector, origin_center_vector) - (sphere.radius * sphere.radius);
-
-	//quadratic discriminant:
-	float discriminant = b*b - a*c;
-	if (discriminant >= 0)
+	glm::vec3 sphere_center = glm::vec3(0.0f, 0.0f, -1.0f);
+	HitRecord tmp_record;
+	bool hit = false;
+	float closest_yet = tmax;
+	for (Hittable const* obj : world)
 	{
-		float temp = (-b - sqrtf(b*b - a*c)) / a;
-		if (temp < tmax && temp > tmin)
+		if (obj->hit(r, tmin, closest_yet, tmp_record))
 		{
-			record.t = (-b - sqrtf(discriminant)) / (2.0f * a);
-			record.position = ray.compute_position(record.t);
-			record.normal = glm::normalize(record.position - sphere.center);
-			return true;
-		}
-		temp = (-b + sqrtf(b*b - a * c)) / a;
-		if (temp < tmax && temp > tmin)
-		{
-			record.t = (-b - sqrtf(discriminant)) / (2.0f * a);
-			record.position = ray.compute_position(record.t);
-			record.normal = glm::normalize(record.position - sphere.center);
-			return true;
+			hit = true;
+			closest_yet = record.t;
+			record = tmp_record;
 		}
 	}
-	return false;
+	return hit;
 }
 
 /* COLOR */
@@ -70,30 +38,10 @@ glm::vec3 background(Ray const& r)
 	return (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7f, 1.0f);
 }
 
-bool trace_against_world(Ray const& r, Sphere const* sphereTable, int sphereCount, float tmin, float tmax, HitRecord& record)
-{
-	glm::vec3 sphere_center = glm::vec3(0.0f, 0.0f, -1.0f);
-	Sphere sph0 = Sphere({ glm::vec3(0.0f, 0.0f, -1.0f), 0.5f });
-	
-	HitRecord tmp_record;
-	bool hit = false;
-	float closest_yet = tmax;
-	for (int i = 0; i < sphereCount; i++)
-	{
-		if (hit_sphere(sphereTable[i], r, tmin, closest_yet, tmp_record))
-		{
-			hit = true;
-			closest_yet = record.t;
-			record = tmp_record;
-		}
-	}
-	return hit;
-}
-
-glm::vec3 compute_color(Ray const& r, Sphere const* sphereTable, int sphereCount)
+glm::vec3 compute_color(Ray const& r, std::vector<Hittable*> const& world)
 {
 	HitRecord record;
-	if (trace_against_world(r, sphereTable, sphereCount, 0.0f, 64.0f, record))
+	if (trace_ray(r, world, 0.0f, 64.0f, record))
 	{
 		return (0.5f*record.normal + 0.5f);
 	}
@@ -118,20 +66,21 @@ int main(int argc, char const *argv[])
 	glm::vec3 eye_positon(0.0f, 0.0f, 1.0f);
 
 	//scene
-	Sphere world[2] = { {glm::vec3(0.0f, 0.0f, -1.0f), 0.5f}, {glm::vec3(0.0f, -100.5f, -1.0f), 100.0f} };
-
+	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f}),
+									 new Sphere({glm::vec3(0.0f, -100.5f, -1.0f), 100.0f}) };
+	
 	for (int py = height - 1; py >= 0; py--)
 	{
 		for (int px = 0; px < width; px++)
 		{
-			//ray trace
+			//trace ray
 			glm::vec2 uv(float(px) / float(width), float(py) / float(height));
 			uv -= glm::vec2(0.5f);
 			glm::vec3 rayDir = glm::vec3(0.0, 0.0, -1.0f) + uv.x * horizontal_axis * aspectRatio + uv.y * vertical_axis;
 			Ray r(eye_positon, rayDir);
-			glm::vec3 c = compute_color(r, world, 2);
+			glm::vec3 c = compute_color(r, world);
 
-			//write file
+			//write to file
 			c *= 255.99f;
 			glm::ivec3 ic = glm::ivec3(std::max(0, int(c.x)), std::max(0, int(c.y)), std::max(0, int(c.z)));
 			outputFile << ic.r << " ";
