@@ -18,16 +18,16 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
 - [X] Make a ray-sphere intersection
   - [X] basic intersection
   - [X] normal computation
-- [ ] Re-factoring
+- [X] Re-factoring
   - [X] Put stuff into structs
   - [X] Generalize raytracing spheres
   - [X] Put some of the structs into separate files
   - [X] Decouple raytracing from writting files
+- [ ] Add very basic material support
+  - [ ] albedo (RGB)
 - [ ] Anti-aliasing/better sampling
   - [ ] basic random
   - [ ] uniform random
-- [ ] Add very basic material support
-  - [ ] albedo (RGB)
 
 ### Side Tasks
 - [ ] Manually build a cornel box
