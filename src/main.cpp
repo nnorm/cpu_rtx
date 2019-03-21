@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <vector>
 #include <glm.hpp>
+#include <random>
 
 /* RAYTRACE */
 bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, float tmax, HitRecord& record)
@@ -65,7 +66,7 @@ int main(int argc, char const *argv[])
 	Material sphereMat = Material({ glm::vec3(0.4f, 0.0f, 1.0f) });//	https://www.beautycolorcode.com/6600ff
 	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, sphereMat}),
 									 new Sphere({glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, floorMat}) };
-	
+
 	//image data
 	std::vector<std::vector<glm::vec3>> image(width, std::vector<glm::vec3>(height, glm::vec3(0.0f)));
 
