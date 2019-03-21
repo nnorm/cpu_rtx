@@ -23,8 +23,9 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
   - [X] Generalize raytracing spheres
   - [X] Put some of the structs into separate files
   - [X] Decouple raytracing from writting files
-- [ ] Add very basic material support
-  - [ ] albedo (RGB)
+- [X] Add very basic material support
+  - [X] albedo (RGB)
+- [ ] Add a proper camera
 - [ ] Anti-aliasing/better sampling
   - [ ] basic random
   - [ ] uniform random
