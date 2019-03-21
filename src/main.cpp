@@ -42,7 +42,7 @@ glm::vec3 compute_color(Ray const& r, std::vector<Hittable*> const& world)
 	HitRecord record;
 	if (trace_ray(r, world, 0.0f, 64.0f, record))
 	{
-		return (0.5f*record.normal + 0.5f);
+		return record.material->albedo;
 	}
 	return background(r);
 }
@@ -61,8 +61,10 @@ int main(int argc, char const *argv[])
 	glm::vec3 eye_positon(0.0f, 0.0f, 1.0f);
 
 	//scene
-	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f}),
-									 new Sphere({glm::vec3(0.0f, -100.5f, -1.0f), 100.0f}) };
+	Material floorMat = Material({ glm::vec3(1.0f, 0.4f, 0.0f) });//	https://www.beautycolorcode.com/ff6600
+	Material sphereMat = Material({ glm::vec3(0.4f, 0.0f, 1.0f) });//	https://www.beautycolorcode.com/6600ff
+	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, sphereMat}),
+									 new Sphere({glm::vec3(0.0f, -100.5f, -1.0f), 100.0f, floorMat}) };
 	
 	//image data
 	std::vector<std::vector<glm::vec3>> image(width, std::vector<glm::vec3>(height, glm::vec3(0.0f)));

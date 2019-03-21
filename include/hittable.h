@@ -2,6 +2,7 @@
 #define _HITTABLE_H_
 #pragma once
 #include <ray.h>
+#include <material.h>
 #include <glm.hpp>
 
 struct HitRecord
@@ -9,6 +10,7 @@ struct HitRecord
 	float t = 0.0f;
 	glm::vec3 position;
 	glm::vec3 normal;
+	Material const* material;
 };
 
 struct Hittable

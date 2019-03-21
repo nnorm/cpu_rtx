@@ -18,6 +18,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.t = temp;
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
+			record.material = &material;
 			return true;
 		}
 		temp = (-b + sqrtf(b*b - a * c)) / a;
@@ -26,6 +27,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.t = temp;
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
+			record.material = &material;
 			return true;
 		}
 	}
