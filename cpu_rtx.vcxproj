@@ -143,12 +143,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\output_file.cpp" />
     <ClCompile Include="src\parse_args.cpp" />
     <ClCompile Include="src\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\hittable.h" />
     <ClInclude Include="include\material.h" />
+    <ClInclude Include="include\output_file.h" />
     <ClInclude Include="include\parse_args.h" />
     <ClInclude Include="include\ray.h" />
     <ClInclude Include="include\sphere.h" />

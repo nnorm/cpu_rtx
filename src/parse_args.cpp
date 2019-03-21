@@ -1,14 +1,14 @@
 #include <parse_args.h>
-#include <cstdio>
-#include <cassert>
+#include <stdio.h>
+#include <assert.h>
 #include <sstream>
 
 argsResult parseCmdlineArgs(int argc, char const *argv[])
 {
     if(argc < 3)
     {
-        std::printf("Invalid usage! \n");
-        std::printf("\tUsage: cpu_rtx.ex WIDTH HEIHGT [output file path]\n");
+        printf("Invalid usage! \n");
+        printf("\tUsage: cpu_rtx.ex WIDTH HEIHGT [output file path]\n");
         assert(false);
     }
     //else
@@ -21,6 +21,11 @@ argsResult parseCmdlineArgs(int argc, char const *argv[])
             res.outputPath = argv[3];
         else
             res.outputPath = "output.ppm";
-        return res;
+        
+#ifdef _DEBUG
+		printf("\tWidth: %zu \n\tHeight: %zu \n\tOutput path: %s\n", res.width, res.height, res.outputPath);
+#endif //_DEBUG
+
+		return res;
     }
 }

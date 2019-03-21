@@ -1,4 +1,5 @@
 #include <parse_args.h>
+#include <output_file.h>
 #include <ray.h>
 #include <hittable.h>
 #include <sphere.h>
@@ -6,8 +7,6 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <assert.h>
-#include <fstream>
-#include <algorithm>
 #include <vector>
 #include <glm.hpp>
 
@@ -54,12 +53,8 @@ int main(int argc, char const *argv[])
     argsResult argsRes = parseCmdlineArgs(argc, argv);
 	int height = int(argsRes.height);
 	int width = int(argsRes.width);
-
-	std::ofstream outputFile(argsRes.outputPath);
-	assert("Could not open output file" && outputFile.is_open());
 	
 	//write file content
-	outputFile << "P3\n" << width << " " << height << "\n" << "255\n";
 	const float aspectRatio = float(width) / float(height);
 	glm::vec3 horizontal_axis(1.0f, 0.0f, 0.0f);
 	glm::vec3 vertical_axis(0.0, 1.0, 0.0);
@@ -69,6 +64,10 @@ int main(int argc, char const *argv[])
 	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f}),
 									 new Sphere({glm::vec3(0.0f, -100.5f, -1.0f), 100.0f}) };
 	
+	//image data
+	std::vector<std::vector<glm::vec3>> image(width, std::vector<glm::vec3>(height, glm::vec3(0.0f)));
+
+	//ray tracing loop
 	for (int py = height - 1; py >= 0; py--)
 	{
 		for (int px = 0; px < width; px++)
@@ -78,20 +77,12 @@ int main(int argc, char const *argv[])
 			uv -= glm::vec2(0.5f);
 			glm::vec3 rayDir = glm::vec3(0.0, 0.0, -1.0f) + uv.x * horizontal_axis * aspectRatio + uv.y * vertical_axis;
 			Ray r(eye_positon, rayDir);
-			glm::vec3 c = compute_color(r, world);
-
-			//write to file
-			c *= 255.99f;
-			glm::ivec3 ic = glm::ivec3(std::max(0, int(c.x)), std::max(0, int(c.y)), std::max(0, int(c.z)));
-			outputFile << ic.r << " ";
-			outputFile << ic.g << " ";
-			outputFile << ic.b << " \n";
+			image[px][py] = compute_color(r, world);
 		}
 	}
-	outputFile << std::endl;
 
-	//close file
-	outputFile.close();
+	//output file
+	write_ppm(argsRes.outputPath, image, width, height);
 
     return 0;
 }

@@ -12,7 +12,6 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
 ## Task list
 ### Following "RT In One Weekend"
 - [X] Output PPM files of any size and filename
-- [X] Build a simple vec3 class
 - [X] Build a ray class
 - [X] Create the main raytracing loop
 - [X] Add background support
@@ -22,8 +21,8 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
 - [ ] Re-factoring
   - [X] Put stuff into structs
   - [X] Generalize raytracing spheres
-  - [ ] Decouple raytracing from writting files
-  - [ ] Put some of the structs into separate files
+  - [X] Put some of the structs into separate files
+  - [X] Decouple raytracing from writting files
 - [ ] Anti-aliasing/better sampling
   - [ ] basic random
   - [ ] uniform random

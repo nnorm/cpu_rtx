@@ -3,6 +3,7 @@
 #pragma once
 #include <ray.h>
 #include <glm.hpp>
+
 struct HitRecord
 {
 	float t = 0.0f;
