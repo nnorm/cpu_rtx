@@ -10,6 +10,7 @@ struct HitRecord
 	float t = 0.0f;
 	glm::vec3 position;
 	glm::vec3 normal;
+	glm::vec2 textureCoords;
 	Material const* material;
 };
 

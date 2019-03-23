@@ -25,10 +25,12 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
   - [X] Decouple raytracing from writting files
 - [X] Add very basic material support
   - [X] albedo (RGB)
-- [ ] Add a proper camera
-- [ ] Anti-aliasing/better sampling
-  - [ ] basic random
-  - [ ] uniform random
+- [X] Add a proper camera
+- [X] Anti-aliasing/better sampling
+  - [X] basic random
+  - [X] uniform random
+- [X] Ambient Lighting/Diffuse Material
+- [ ] Specular Lighting
 
 ### Side Tasks
 - [ ] Manually build a cornel box

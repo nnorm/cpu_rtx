@@ -2,6 +2,7 @@
 
 bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) const
 {
+	const float PI = 3.14159265359f;
 	glm::vec3 origin_center_vector = ray.origin - center;
 	//quadratic equation (ax² + bx + c) factors:
 	float a = glm::dot(ray.direction, ray.direction);
@@ -19,6 +20,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
 			record.material = &material;
+			record.textureCoords = glm::vec2(asinf(record.normal.x) / PI, asinf(record.normal.y) / PI ) + 0.5f;
 			return true;
 		}
 		temp = (-b + sqrtf(b*b - a * c)) / a;
@@ -28,6 +30,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
 			record.material = &material;
+			record.textureCoords = glm::vec2(asinf(record.normal.x) / PI, asinf(record.normal.y) / PI) + 0.5f;
 			return true;
 		}
 	}

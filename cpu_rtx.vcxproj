@@ -142,12 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\output_file.cpp" />
     <ClCompile Include="src\parse_args.cpp" />
     <ClCompile Include="src\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\hittable.h" />
     <ClInclude Include="include\material.h" />
     <ClInclude Include="include\output_file.h" />
