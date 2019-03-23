@@ -3,7 +3,7 @@
 ## Description
 This is my C++11 implementation of a CPU software raytracer that outputs PPM files.  
 It is based off **Peter Shirley's** raytracing book series, available [here](http://www.realtimerendering.com/raytracing/ "FTP root to download PDF") for free.  
-One of the goal is to try to implement something usable to get reference images for various physically-based stuff. As such I might use [PBRT](http://www.pbr-book.org/) for that. For now it is a simple raytracer but it could become a more complicated path-tracer.
+One of the goal is to try to implement something usable to get reference images for various physically-based stuff. As such I might use [PBRT](http://www.pbr-book.org/) for that. For now it is simple but it could become a more complicated path-tracer.
 
 ## Philosophy
 This is me trying to write yet-another-raytracer with minimal dependencies.  
@@ -29,8 +29,11 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
 - [X] Anti-aliasing/better sampling
   - [X] basic random
   - [X] uniform random
-- [X] Ambient Lighting/Diffuse Material
-- [ ] Specular Lighting
+- [X] Ambient/Diffuse Lighting basics
+- [X] Specular Lighting basics
+- [ ] Improving performance and quality
+- [ ] Re-factoring
+- [ ] Depth-of-Field
 
 ### Side Tasks
 - [ ] Manually build a cornel box

@@ -19,7 +19,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.t = temp;
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
-			record.material = &material;
+			record.material = material;
 			record.textureCoords = glm::vec2(asinf(record.normal.x) / PI, asinf(record.normal.y) / PI ) + 0.5f;
 			return true;
 		}
@@ -29,7 +29,7 @@ bool Sphere::hit(Ray const & ray, float tmin, float tmax, HitRecord & record) co
 			record.t = temp;
 			record.position = ray.compute_position(record.t);
 			record.normal = glm::normalize(record.position - center);
-			record.material = &material;
+			record.material = material;
 			record.textureCoords = glm::vec2(asinf(record.normal.x) / PI, asinf(record.normal.y) / PI) + 0.5f;
 			return true;
 		}
