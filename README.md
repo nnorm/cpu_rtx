@@ -31,9 +31,16 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
   - [X] uniform random
 - [X] Ambient/Diffuse Lighting basics
 - [X] Specular Lighting basics
-- [ ] Improving performance and quality
-- [ ] Re-factoring
+- [X] Re-factoring
+  - [X] Shading ray generation in the material
+  - [X] Fix progress bar
+  - [X] Move utility functions somewhere else
+  - [X] General clean-up and documentation
+- [X] Add plane primitive
+- [ ] Postionable camera
 - [ ] Depth-of-Field
+- [ ] Improving performance and quality
+- [ ] Refraction support
 
 ### Side Tasks
 - [ ] Manually build a cornel box

@@ -9,7 +9,8 @@ struct Sphere
 	Sphere(glm::vec3 const& c = glm::vec3(0.0f), float r = 0.5f, Material* mat = new Material())
 		: center(c), radius(r), material(mat)
 	{}
-	//Object Attributes:
+
+	//Data
 	glm::vec3 center;
 	float radius;
 	Material* material;
