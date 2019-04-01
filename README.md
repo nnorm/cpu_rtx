@@ -37,8 +37,8 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
   - [X] Move utility functions somewhere else
   - [X] General clean-up and documentation
 - [X] Add plane primitive
-- [ ] Postionable camera
-- [ ] Depth-of-Field
+- [X] Postionable camera
+- [X] Depth-of-Field
 - [ ] Improving performance and quality
 - [ ] Refraction support
 

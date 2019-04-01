@@ -15,16 +15,12 @@
 #include <glm.hpp>
 #include <random>
 
-static constexpr int gp_SuperSamplingCount = 16;
-static constexpr int gp_MaxRaysDepth = 4;
+static constexpr int gp_SuperSamplingCount = 32;
+static constexpr int gp_MaxRaysDepth = 16;
 
 static constexpr float g_PI = 3.14159265359f;
 static constexpr float g_Gamma = 2.22f;
 static constexpr float g_invGamma = 1.0f / g_Gamma;
-
-//static std::random_device global_random_device;
-//static std::mt19937 global_mt19937_generator(global_random_device());
-//static std::uniform_real_distribution<float> dirRng(-1.0f, 1.0f);
 
 /* RAYTRACE */
 bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, float tmax, HitRecord& record)
@@ -37,7 +33,7 @@ bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, fl
 		if (obj->hit(r, tmin, closest_yet, tmp_record))
 		{
 			hit = true;
-			closest_yet = record.t;
+			closest_yet = tmp_record.t;
 			record = tmp_record;
 		}
 	}
@@ -47,8 +43,8 @@ bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, fl
 /* COLOR */
 glm::vec3 sky(Ray const& r)
 {
-	glm::vec3 normalize_direction = glm::normalize(r.direction/2.0f);
-	float t = 0.5f * normalize_direction.y + 0.5f;
+	glm::vec3 normalized_direction = glm::normalize(r.direction/2.0f);
+	float t = 0.5f * normalized_direction.y + 0.5f;
 	glm::vec3 outputColor = (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7f, 1.0f);
 	return outputColor;
 }
@@ -109,8 +105,13 @@ int main(int argc, char const *argv[])
 	//camera setup
 	const glm::vec2 imageResolution = glm::vec2(float(width), float(height));
 	const float aspectRatio = imageResolution.x / imageResolution.y;
-	Camera cam;
-	cam.eye_position = glm::vec3(0.0, 0.0, 2.0f);
+	constexpr float fov = 32.0f;
+	const glm::vec3 cameraPosition = glm::vec3(3.0f, 3.0f, 2.0f);
+	const glm::vec3 cameraLookAt = glm::vec3(0.0f, 0.0f, -1.0f);
+	const glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	const float cameraFocusDist = 5.2f;//static_cast<float>((cameraPosition - cameraLookAt).length());
+	constexpr float cameraAperture = 1.0f;
+	Camera cam(fov, aspectRatio, cameraAperture, cameraFocusDist, cameraPosition, cameraLookAt, cameraUp);
 
 	//scene setup
 	Material floorMat = Material({ glm::vec3(0.01f) });//	https://www.beautycolorcode.com/ff6600
@@ -120,9 +121,13 @@ int main(int argc, char const *argv[])
 	Material sphereMat2 = Material({ glm::vec3(0.75164f, 0.60648f, 0.22648f) });// gold
 	sphereMat2.roughness = 0.005f;
 	sphereMat2.specularR = glm::vec3(0.628281f, 0.555802f, 0.366065f);
+	Material sphereMat3 = Material({ glm::vec3(0.714f, 0.4284f, 0.18144f) });// bronze
+	sphereMat3.roughness = 0.05f;
+	sphereMat3.specularR = glm::vec3(0.393548f, 0.271906f, 0.166721f);
 
-	std::vector<Hittable*> world = { new Sphere({glm::vec3(0.6f, 0.0f, -1.0f), 0.5f, &sphereMat}),
-									 new Sphere({glm::vec3(-0.6f, 0.0f, -1.0f), 0.5f, &sphereMat2}),
+	std::vector<Hittable*> world = { new Sphere({glm::vec3(1.0f, 0.0f, -1.0f), 0.5f, &sphereMat}),
+									 new Sphere({glm::vec3(-1.0f, 0.0f, -1.0f), 0.5f, &sphereMat2}),
+									 new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, &sphereMat3}),
 									 new Plane({glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0, -0.5, 0.0f), &floorMat}) };
 
 	//image data buffer allocation
@@ -145,12 +150,12 @@ int main(int argc, char const *argv[])
 				pixelCoordJitter.y = randomNumberGen() * 0.5f + 0.5f;
 				glm::vec2 uv = (glm::vec2(float(px), float(py)) + pixelCoordJitter) / imageResolution;
 
-				Ray r = cam.getRD(uv, aspectRatio);
+				Ray r = cam.getRD(uv);
 				color += compute_color(r, world, gp_MaxRaysDepth);
 			}
 			color /= float(gp_SuperSamplingCount);
 			
-			//linear to gamma
+			//linear to gamma space
 			color = glm::pow(color, glm::vec3(g_invGamma));
 			
 			//write to image buffer
