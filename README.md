@@ -63,3 +63,9 @@ Although I try to make it compilable somewhere else, I don't plan on writting su
   - [ ] json is a popular choice
   - [ ] Write a cornel box scene to test
   - [ ] Add terminal UI to input a test scene path before raytracing
+
+## Result so far
+    Resolution: 3840x2160
+    Sample per-pixel: 32
+    Rays per sample: 4
+![4K render](_readme_src/output_uhd.png)
