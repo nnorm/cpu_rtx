@@ -9,14 +9,13 @@
 
 #include <stdio.h>
 #include <stddef.h>
-#include <time.h>
 #include <assert.h>
 #include <vector>
 #include <glm.hpp>
 #include <random>
 
-static constexpr int gp_SuperSamplingCount = 32;
-static constexpr int gp_MaxRaysDepth = 16;
+static constexpr int gp_SuperSamplingCount = 64;
+static constexpr int gp_MaxRaysDepth = 4+1;
 
 static constexpr float g_PI = 3.14159265359f;
 static constexpr float g_Gamma = 2.22f;
@@ -43,7 +42,7 @@ bool trace_ray(Ray const& r, std::vector<Hittable*> const& world, float tmin, fl
 /* COLOR */
 glm::vec3 sky(Ray const& r)
 {
-	glm::vec3 normalized_direction = glm::normalize(r.direction/2.0f);
+	glm::vec3 normalized_direction = r.direction/2.0f;
 	float t = 0.5f * normalized_direction.y + 0.5f;
 	glm::vec3 outputColor = (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7f, 1.0f);
 	return outputColor;
@@ -56,7 +55,7 @@ glm::vec3 compute_color(Ray const& r, std::vector<Hittable*> const& world, int m
 	else
 	{
 		HitRecord record;
-		if (trace_ray(r, world, 0.001f, 512.0f, record))
+		if (trace_ray(r, world, 0.001f, 32.0f, record))
 		{
 			glm::vec3 diffuseColor = glm::vec3(0.0f);
 			glm::vec3 specularColor = glm::vec3(0.0f);
@@ -65,25 +64,30 @@ glm::vec3 compute_color(Ray const& r, std::vector<Hittable*> const& world, int m
 			//Compute diffuse lighting
 			{
 				Ray diffuseRay = record.material->computeDiffuseRay(r, &record);
-				float NoI = std::max(0.0f, glm::dot(record.normal, diffuseRay.direction));
+				float NoH = std::max(0.0f, glm::dot(record.normal, glm::normalize(diffuseRay.direction + V)));
 				float maxSpec = 1.0f - std::max(record.material->specularR.r, std::max(record.material->specularR.g, record.material->specularR.b));
 
 				diffuseColor += compute_color(diffuseRay, world, max_depth - 1) * std::max(0.0f, glm::dot(diffuseRay.direction, record.normal)) *
-					(1.0f - fresnel_schlick(NoI, record.material->specularR)) * ((maxSpec * record.material->albedo) / g_PI);
+					(1.0f - fresnel_schlick(NoH, record.material->specularR)) * ((maxSpec * record.material->albedo) / g_PI);
 			}
 
 			//Compute specular lighting
 			{
-				Ray specularRay = record.material->computeSpecularRay(r, &record);
-				if (glm::dot(specularRay.direction, record.normal) > 0)
+				if (record.material->roughness <= 0.99995f)
 				{
-					float NoH = std::max(0.0f, glm::dot(record.normal, glm::normalize(specularRay.direction + V)));
-					specularColor += compute_color(specularRay, world, max_depth - 1)
-						* fresnel_schlick(NoH, record.material->specularR) * record.material->specularR;
+					Ray specularRay = record.material->computeSpecularRay(r, &record);
+					if (glm::dot(specularRay.direction, record.normal) > 0)
+					{
+						float NoH = std::max(0.0f, glm::dot(record.normal, glm::normalize(specularRay.direction + V)));
+						specularColor += compute_color(specularRay, world, max_depth - 1) * std::max(0.0f, glm::dot(specularRay.direction, record.normal))
+							* fresnel_schlick(NoH, record.material->specularR) * record.material->specularR;
+					}
 				}
 			}
-
-			return diffuseColor + specularColor;
+			if(max_depth == gp_MaxRaysDepth)
+				return diffuseColor + specularColor;
+			else
+				return (diffuseColor * (1.0f / 2.0f*g_PI)) + specularColor;
 		}
 
 		//ray miss, return sky color
@@ -100,16 +104,16 @@ int main(int argc, char const *argv[])
 	int width = int(argsRes.width);
 	
 	//reset random seed
-	srand(static_cast<unsigned int>(time(NULL)));
+	resetRNGSeed();
 
 	//camera setup
 	const glm::vec2 imageResolution = glm::vec2(float(width), float(height));
 	const float aspectRatio = imageResolution.x / imageResolution.y;
-	constexpr float fov = 32.0f;
-	const glm::vec3 cameraPosition = glm::vec3(3.0f, 3.0f, 2.0f);
-	const glm::vec3 cameraLookAt = glm::vec3(0.0f, 0.0f, -1.0f);
+	constexpr float fov = 90.0f;
+	const glm::vec3 cameraPosition = glm::vec3(2.0f, 1.0f, 1.0f);
+	const glm::vec3 cameraLookAt = glm::vec3(0.0f, 0.0f, -1.5f);
 	const glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	const float cameraFocusDist = 5.2f;//static_cast<float>((cameraPosition - cameraLookAt).length());
+	const float cameraFocusDist = 2.8f;
 	constexpr float cameraAperture = 1.0f;
 	Camera cam(fov, aspectRatio, cameraAperture, cameraFocusDist, cameraPosition, cameraLookAt, cameraUp);
 
@@ -130,7 +134,7 @@ int main(int argc, char const *argv[])
 									 new Sphere({glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, &sphereMat3}),
 									 new Plane({glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0, -0.5, 0.0f), &floorMat}) };
 
-	//image data buffer allocation
+	//image buffer allocation
 	std::vector<std::vector<glm::vec3>> image(width, std::vector<glm::vec3>(height, glm::vec3(0.0f)));
 
 	//ray tracing loop
@@ -144,18 +148,18 @@ int main(int argc, char const *argv[])
 			//trace rays
 			glm::vec3 color = glm::vec3(0.0f);
 			glm::vec2 pixelCoordJitter = glm::vec2(0.0f);
+			const glm::vec2 pixelCoordinates = glm::vec2(float(px), float(py));
 			for (int i = 0; i < gp_SuperSamplingCount; i++)
 			{
-				pixelCoordJitter.x = randomNumberGen() * 0.5f + 0.5f;
-				pixelCoordJitter.y = randomNumberGen() * 0.5f + 0.5f;
-				glm::vec2 uv = (glm::vec2(float(px), float(py)) + pixelCoordJitter) / imageResolution;
+				pixelCoordJitter = glm::vec2(randomNumberGen(), randomNumberGen());
+				glm::vec2 uv = (pixelCoordinates + pixelCoordJitter) / imageResolution;
 
 				Ray r = cam.getRD(uv);
 				color += compute_color(r, world, gp_MaxRaysDepth);
 			}
 			color /= float(gp_SuperSamplingCount);
 			
-			//linear to gamma space
+			//linear to gamma colorspace
 			color = glm::pow(color, glm::vec3(g_invGamma));
 			
 			//write to image buffer
@@ -169,7 +173,7 @@ int main(int argc, char const *argv[])
 	}
 
 	//output file
-	write_ppm(argsRes.outputPath, image, width, height);
+	write_ppm_binary(argsRes.outputPath, image, width, height);
 
     return 0;
 }

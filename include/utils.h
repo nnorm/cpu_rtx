@@ -2,6 +2,7 @@
 #define _UTILS_H_
 #pragma once
 #include <stdio.h>
+#include <time.h>
 #include <random>
 #include <glm.hpp>
 
@@ -16,6 +17,12 @@ inline void printProgressBar(double percentage)
 	int rpad = PBWIDTH - lpad;
 	printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
 	fflush(stdout);
+}
+
+//Reset random number generator seed
+inline void resetRNGSeed()
+{
+	srand(static_cast<unsigned int>(time(NULL)));
 }
 
 //Generates floats in the [-1, 1] range
